@@ -238,6 +238,7 @@ func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileS
 	}
 }
 
+// combineHandlers 把 handlers 加入到 RouterGroup.Handlers 后面
 func (group *RouterGroup) combineHandlers(handlers HandlersChain) HandlersChain {
 	finalSize := len(group.Handlers) + len(handlers)
 	assert1(finalSize < int(abortIndex), "too many handlers")

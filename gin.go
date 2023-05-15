@@ -160,16 +160,20 @@ type Engine struct {
 	FuncMap          template.FuncMap
 	allNoRoute       HandlersChain
 	allNoMethod      HandlersChain
-	noRoute          HandlersChain
-	noMethod         HandlersChain
-	pool             sync.Pool
-	trees            methodTrees
-	maxParams        uint16
-	maxSections      uint16
-	trustedProxies   []string
-	trustedCIDRs     []*net.IPNet
+	// 404
+	noRoute HandlersChain
+	// 405
+	noMethod       HandlersChain
+	pool           sync.Pool
+	trees          methodTrees
+	maxParams      uint16
+	maxSections    uint16
+	trustedProxies []string
+	trustedCIDRs   []*net.IPNet
 }
 
+// NOTE: 要求*Engine必须实现IRouter，否则会编译错误
+// Question: 为什么只要求实现IRouter？
 var _ IRouter = (*Engine)(nil)
 
 // New returns a new blank Engine instance without any middleware attached.
@@ -304,6 +308,7 @@ func (engine *Engine) NoMethod(handlers ...HandlerFunc) {
 // Use attaches a global middleware to the router. i.e. the middleware attached through Use() will be
 // included in the handlers chain for every single request. Even 404, 405, static files...
 // For example, this is the right place for a logger or error management middleware.
+// NOTE: Use 其实就是把 middleware 加入到 RouterGroup.Handlers 中
 func (engine *Engine) Use(middleware ...HandlerFunc) IRoutes {
 	engine.RouterGroup.Use(middleware...)
 	engine.rebuild404Handlers()
